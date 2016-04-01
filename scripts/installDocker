@@ -1,0 +1,11 @@
+#! /bin/bash
+# If not Docker process is running
+# Then means that is not installed, for this reason
+# Will install Docker in the instance.
+
+docker="$(pgrep docker)"
+if [[ "$docker" == "" ]]; then
+	sudo yum update -y
+	sudo yum install docker -y
+	sudo /etc/init.d/docker start
+fi

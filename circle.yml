@@ -1,0 +1,48 @@
+machine:
+  services:
+    - docker
+  environment:
+    dockeruser: ponchov
+    dockermail: alfonsovaldes84@gmail.com
+    dockerpass: clickit_t3ch
+
+dependencies:
+  cache_directories:
+    - "~/docker"
+  override:
+    - docker info
+    #- a=$(docker ps -a| awk '{print $1}'); docker rm -f $a
+    - if [[ -e ~/docker/image.tar ]]; then docker load --input ~/docker/image.tar; fi
+    - sudo docker build -t ponchov/cake:latest .
+    - mkdir -p ~/docker; docker save ponchov/cake > ~/docker/image.tar
+    - ls ~/docker
+
+test:
+  override:
+    - docker run -itd -p 9200:80 ponchov/cake:latest; sleep 10
+#    - docker run -d -it -p 9200:80 --name cake
+    - curl --retry 3 --retry-delay 5 -v http://localhost:9200
+    - curl http://localhost:9200
+    - hostname
+    - whoami
+  post:
+    - ps aux | grep apache2
+    - mysql -uroot -e "show databases"
+    - docker login -e $dockermail -u $dockeruser -p $dockerpass
+    - docker push ponchov/cake:latest
+#    - a=$(curl -sI http://localhost:9200| head -n1| awk '{print $2}'); if [[ "$a" = "500" ]]; then exit 1 = $? ; fi
+#    - a=$(curl -sI http://localhost:9200| head -n1| awk '{print $2}'); if [[ "$a" = "404" ]]; then exit 1 = $? ; fi
+
+deployment:
+  staging:
+    branch: master
+    codedeploy:
+      cakephp:
+        application_root: /
+        region: us-west-2
+        revision_location:
+          revision_type: S3
+          s3_location:
+            bucket: circle-testing
+            key_pattern: cakephp-{BRANCH}-{SHORT_COMMIT}
+        deployment_group: cakephp-deploy

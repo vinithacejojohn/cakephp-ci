@@ -1,0 +1,14 @@
+version: 0.0
+os: linux
+files:
+  - source: /cakephp
+    destination: /var/www/html/cakephp
+hooks:
+  BeforeInstall:
+    - location: scripts/installDocker
+      timeout: 600
+      runas: root
+  AfterInstall:
+    - location: scripts/updateImage
+      timeout: 600
+      runas: root

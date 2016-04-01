@@ -1,0 +1,36 @@
+machine:
+  services:
+    - docker
+  environment:
+    dockeruser: ponchov
+    dockermail: alfonsovaldes84@gmail.com
+    dockerpass: clickit_t3ch
+
+dependencies:
+  cache_directories:
+    - "~/docker"
+  override:
+    - docker info
+    - if [[ -e ~/docker/image.tar ]]; then docker load --input ~/docker/image.tar; fi
+    - docker build -t ponchov/cakephp:latest .
+    - mkdir -p ~/docker; docker save ponchov/cakephp > ~/docker/image.tar
+    - ls ~/docker
+
+test:
+  override:
+    - docker run -d -p 9200:80 ponchov/cakephp:latest; sleep 10
+    - curl --retry 3 --retry-delay 5 -v http://localhost:9200
+    - ps aux | grep apache2
+    - mysql -uroot -e "show databases"
+    - ls /etc/apache2/sites-enabled/
+    - ls /var/www/html
+
+#    - a=$(curl -sI http://localhost:9200| head -n1| awk '{print $2}'); if [[ "$a" = "500" ]]; then exit 1 = $? ; fi
+#    - a=$(curl -sI http://localhost:9200| head -n1| awk '{print $2}'); if [[ "$a" = "404" ]]; then exit 1 = $? ; fi
+
+#deployment:
+#  hub:
+#    branch: master
+#    commands:
+#      - docker login -e $dockermail -u $dockeruser -p $dockerpass
+#      - docker push ponchov/cakephp:latest

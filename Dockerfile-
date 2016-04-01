@@ -1,0 +1,14 @@
+#FROM wordpress:4.4.2-apache 
+FROM ponchov/wordpress442:latest
+
+RUN apt-get update -y && apt-get install -y net-tools supervisor
+
+#RUN mkdir /var/www/html/wordpress
+ADD  wordpress /var/www/html/wordpress
+RUN chown -R www-data:www-data /var/www/html
+ADD ./wordpress.conf /etc/apache2/sites-enabled/wordpress.conf
+
+EXPOSE 80
+RUN sed  -i "1i ServerName $(ifconfig | grep "inet addr" | awk '{print $2}' | head -n 1 | cut -d: -f2)" /etc/apache2/apache2.conf
+COPY ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+CMD ["/usr/bin/supervisord"]
