@@ -8,5 +8,6 @@ runImage="cakephp"
 docker rm -f $runImage
 docker rmi -f $image
 docker pull $image
-docker run -tid -p 8082:80 -v /var/www/html/cakephp:/var/www/html/cakephp --name $runImage $image
+#docker run -tid -p 8082:80 -v /var/www/html/cakephp:/var/www/html/cakephp --name $runImage $image
+docker run -tid -p 8082:80 --name $runImage $image
 rm -rf /tmp/*
