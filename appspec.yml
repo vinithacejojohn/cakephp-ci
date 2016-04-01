@@ -1,8 +1,8 @@
 version: 0.0
 os: linux
 files:
-  - source: /cakephp
-    destination: /var/www/html/cakephp
+  - source: /
+    destination: /tmp
 hooks:
   BeforeInstall:
     - location: scripts/installDocker
