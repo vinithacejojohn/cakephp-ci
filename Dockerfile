@@ -1,7 +1,7 @@
 #FROM ponchov/cake
 FROM whatwedo/apache-php56
 
-RUN apt-get update && apt-get install -y php5-intl php5-cli supervisor php5-mbstring libapache2-mod-php5
+RUN apt-get update && apt-get install -y php5-intl php5-cli supervisor libapache2-mod-php5
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-client mysql-server openssh-client openssh-server
 
 RUN mkdir -p /var/www/html
